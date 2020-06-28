@@ -1,5 +1,5 @@
 let mysql = require("mysql");
-let dotenv = require("dotenv");
+let dotenv = require("dotenv").config();
 let inquirer = require("inquirer");
 
 
@@ -42,10 +42,7 @@ connection.connect(function (err) {
 //   * View departments, roles, employees
 
 //   * Update employee roles
-// function addRole() {
-//     inquirer.prompt([
-//         function addDepartment() {
-//             inquirer.prompt([
+
 function addEmployee() {
     inquirer.prompt([
         {
@@ -63,9 +60,18 @@ function addEmployee() {
             name: "role",
             message: "What is the Employee's role?"
         }        
-        ]).then(function (data) {
-        let newEmployee = new Engineer(data.name, data.id, data.email, data.github);
-        employeeInformation.push(engineer);
+        ]).then(function (answer) {
+        connection.query(
+            "INSERT INTO employee SET ?",
+            {
+                first_name: answer.first-name,
+                last_name: answer.last-name 
+            },
+            function (err) {
+                if (err) throw err;
+                console.log("You're employee was added successfully")
+            }
+        )
 
         switch (data.position) {
             case "Engineer":

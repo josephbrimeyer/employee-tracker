@@ -1,7 +1,7 @@
 let mysql = require("mysql");
 let dotenv = require("dotenv").config();
 let inquirer = require("inquirer");
-const { createSecretKey } = require("crypto");
+
 
 let connection = mysql.createConnection({
     host: "localhost",
@@ -87,6 +87,16 @@ function runSearch() {
             }
         });
 }
+function viewAllEmployees() {
+    console.log("Selecting all employees....\n");
+    connection.query("SELECT * FROM employee", function (err, res) {
+        if (err) throw err;
+        //log results from the SELECT statement
+        console.log(res.length + " employees found.");
+        console.table(res);
+        runSearch();
+    });
+}
 
 function addEmployee() {
     inquirer.prompt([
@@ -114,7 +124,7 @@ function addEmployee() {
             },
             function (err) {
                 if (err) throw err;
-                console.log("You're employee was added successfully")
+                console.log("You're employee was successfully added")
             }
         )
     });
@@ -133,6 +143,16 @@ runSearch();
 
 //   * Update employee roles
 
+// function viewEmployees() {
+//     console.log("Selecting all employees....\n");
+//     connection.query("SELECT * FROM employee", function (err, res) {
+//       if (err) throw err;
+//       //log results from the SELECT statement
+//       console.log(res.length + " employees found.");
+//       console.table('All Employees', res);
+//       startEmployee();
+//     });
+//   }
 
 //     ]).then(function (data) {
 //         let engineer = new Engineer(data.name, data.id, data.email, data.github);

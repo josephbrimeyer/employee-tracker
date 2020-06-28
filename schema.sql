@@ -10,17 +10,14 @@ CREATE TABLE department (
   PRIMARY KEY (id)
 );
 
-USE employee_trackerDB;
-
 CREATE TABLE roles (
   id INTEGER NOT NULL,
   title VARCHAR(30) NOT NULL,
   salary DECIMAL NOT NULL,
   department_id INTEGER NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE CASCADE
 );
-
-USE employee_trackerDB;
 
 CREATE TABLE employee (
   id INTEGER AUTO_INCREMENT,
@@ -28,5 +25,8 @@ CREATE TABLE employee (
   last_name VARCHAR(30) NOT NULL,
   role_id INTEGER NOT NULL,
   manager_id INTEGER NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+  FOREIGN KEY (manager_id) REFERENCES employee(id) ON DELETE SET NULL
 );
+

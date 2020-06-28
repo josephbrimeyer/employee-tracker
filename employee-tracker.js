@@ -1,32 +1,12 @@
 let mysql = require("mysql");
 let dotenv = require("dotenv").config();
 let inquirer = require("inquirer");
-
-
-// functions for user selected criteria
-// viewAllEmployees
-// viewAllEmployeesByDepartment
-// viewAllEmployeesbyManager
-// addEmployee
-// removeEmployee
-// updateEmployee
-// updateEmployeeRole
-// updateEmployeeManager
-// viewAllRoles
-// addRole
-// removeRole
-// addDepartment
+const { createSecretKey } = require("crypto");
 
 let connection = mysql.createConnection({
     host: "localhost",
-
-    // Your port; if not 3306
     port: 3306,
-
-    // Your username
     user: "root",
-
-    // Your password
     password: process.env.DB_PASSWORD,
     database: "employee_trackerDB"
 });
@@ -35,13 +15,78 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
 });
-// Build a command-line application that at a minimum allows the user to:
 
-//   * Add departments, roles, employees
+function runSearch() {
+    inquirer
+        .prompt({
+            name: "action",
+            type: "rawlist",
+            choices: [
+                "View all Employees",
+                "View all Employees by Department",
+                "View all Employees by Manager",
+                "Add an Employee",
+                "Remove an Employee",
+                "Update an Employee",
+                "Update an Employee's Role",
+                "Update an Employee's Manager",
+                "View all roles",
+                "Add a role",
+                "Remove a role",
+                "Add a department"
+            ]
+        })
+        .then(function (answer) {
+            switch (answer.action) {
+                case "View all Employees":
+                    viewAllEmployees();
+                    break;
 
-//   * View departments, roles, employees
+                case "View all Employees by Department":
+                    viewAllEmployeesByDepartment();
+                    break;
 
-//   * Update employee roles
+                case "View all Employees by Manager":
+                    viewAllEmployeesbyManager();
+                    break;
+
+                case "Add an Employee":
+                    addEmployee();
+                    break;
+
+                case "Remove an Employee":
+                    removeEmployee();
+                    break;
+
+                case "Update an Employee":
+                    updateEmployee();
+                    break;
+
+                case "Update an Employee's Role":
+                    updateEmployeeRole();
+                    break;
+
+                case "Update an Employee's Manager":
+                    updateEmployeeManager();
+                    break;
+
+                case "View all roles":
+                    viewAllRoles();
+                    break;
+
+                case "Add a role":
+                    addRole();
+                    break;
+
+                case "Remove a role":
+                    removeRole();
+                    break;
+                case "Add a department":
+                    addDepartment();
+                    break;
+            }
+        });
+}
 
 function addEmployee() {
     inquirer.prompt([
@@ -59,62 +104,36 @@ function addEmployee() {
             type: "input",
             name: "role",
             message: "What is the Employee's role?"
-        }        
-        ]).then(function (answer) {
+        }
+    ]).then(function (answer) {
         connection.query(
             "INSERT INTO employee SET ?",
             {
-                first_name: answer.first-name,
-                last_name: answer.last-name 
+                first_name: answer.first - name,
+                last_name: answer.last - name
             },
             function (err) {
                 if (err) throw err;
                 console.log("You're employee was added successfully")
             }
         )
-
-        switch (data.position) {
-            case "Engineer":
-                makeEngineer();
-                break;
-            case "Intern":
-                makeIntern();
-                break;
-            default:
-                createHtml();
-        }
     });
 }
+runSearch();
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// ......................reference code..........................................................
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//  Build a command-line application that at a minimum allows the user to:
+
+//   * Add departments, roles, employees
+
+//   * View departments, roles, employees
+
+//   * Update employee roles
 
 
-// function makeEngineer() {
-//     inquirer.prompt([
-//         {
-//             type: "input",
-//             name: "name",
-//             message: "What is the Engineer's name?"
-//         },
-//         {
-//             type: "input",
-//             name: "email",
-//             message: "What is the Engineer's email address?"
-//         },
-//         {
-//             type: "input",
-//             name: "id",
-//             message: "What is the Engineer's id number?"
-//         },
-//         {
-//             type: "input",
-//             name: "github",
-//             message: "Enter the Engineer's GitHub user name:",
-//         },
-//         {
-//             type: "list",
-//             name: "position",
-//             message: "Would you like to add another role?",
-//             choices: ['Engineer', 'Intern', 'Exit'],
-//         }
 //     ]).then(function (data) {
 //         let engineer = new Engineer(data.name, data.id, data.email, data.github);
 //         employeeInformation.push(engineer);
@@ -131,35 +150,6 @@ function addEmployee() {
 //         }
 //     });
 // }
-
-// function makeIntern() {
-//     inquirer.prompt([
-//         {
-//             type: "input",
-//             name: "name",
-//             message: "What is the Intern's name?"
-//         },
-//         {
-//             type: "input",
-//             name: "email",
-//             message: "What is the Intern's email address?"
-//         },
-//         {
-//             type: "input",
-//             name: "id",
-//             message: "What is the Intern's id number?"
-//         },
-//         {
-//             type: "input",
-//             name: "school",
-//             message: "What is the name of the Intern's school?",
-//         },
-//         {
-//             type: "list",
-//             name: "position",
-//             message: "Would you like to add another role?",
-//             choices: ['Engineer', 'Intern', 'Exit'],
-//         }
 //     ]).then(function (data) {
 //         let intern = new Intern(data.name, data.id, data.email, data.school);
 //         employeeInformation.push(intern);

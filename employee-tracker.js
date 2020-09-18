@@ -1,6 +1,7 @@
 let mysql = require("mysql");
 require("dotenv").config();
 let inquirer = require("inquirer");
+let consoleTable = require("console.table");
 
 let roleArrray = [];
 let employeeArray = [];

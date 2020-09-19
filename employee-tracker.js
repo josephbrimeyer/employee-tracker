@@ -116,6 +116,15 @@ function viewAllRoles() {
     runSearch();
   });
 }
+
+function viewAllRoles() {
+  connection.query("SELECT * FROM role", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    start();
+  });
+}
+
 function addEmployee() {
   connection.query("SELECT * FROM role", function (err, res) {
     if (err) throw err;
@@ -147,8 +156,10 @@ function addEmployee() {
       connection.query(
         "INSERT INTO employee SET ?",
         {
-          first_name: answer.first - name,
-          last_name: answer.last - name,
+          first_name: answer.first_name,
+          last_name: answer.last_name,
+          role_id: answer.role_id,
+          manager_id: answer.manager_id,
         },
         function (err) {
           if (err) throw err;

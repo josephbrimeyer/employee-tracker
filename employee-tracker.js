@@ -14,14 +14,6 @@ let connection = mysql.createConnection({
   database: "employee_trackerDB",
 });
 
-let connectionTwo = mysql.createConnection({
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: process.env.DB_PASSWORD,
-  database: "employee_trackerDB",
-});
-
 connection.connect(function (err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId + "\n");
@@ -32,6 +24,7 @@ function runSearch() {
     .prompt({
       name: "action",
       type: "rawlist",
+      message: "Choose one of the following actions:",
       choices: [
         "View all Employees",
         "View all Employees by Department",
@@ -44,7 +37,7 @@ function runSearch() {
         "View all roles",
         "Add a role",
         "Remove a role",
-        "Add a department",
+        "Add a department"
       ],
     })
     .then(function (answer) {
@@ -92,12 +85,16 @@ function runSearch() {
         case "Remove a role":
           removeRole();
           break;
+
         case "Add a department":
           addDepartment();
           break;
-      }
+      };
     });
-}
+  };
+
+
+  
 function viewAllEmployees() {
   console.log("Selecting all employees....\n");
   connection.query("SELECT * FROM employee", function (err, res) {
@@ -109,21 +106,11 @@ function viewAllEmployees() {
   });
 }
 
-function viewAllRoles() {
-  connection.query("SELECT * FROM role", function (err, res) {
-    if (err) throw err;
-    console.table(res);
-    runSearch();
-  });
-}
+function viewAllEmployeesByDepartment() {}
 
-function viewAllRoles() {
-  connection.query("SELECT * FROM role", function (err, res) {
-    if (err) throw err;
-    console.table(res);
-    start();
-  });
-}
+function viewAllEmployeesByDepartment() {}
+
+function viewAllEmployeesbyManager() {}
 
 function addEmployee() {
   connection.query("SELECT * FROM role", function (err, res) {
@@ -133,24 +120,29 @@ function addEmployee() {
       console.log(roleList);
       roleArrray.push(roleList);
     }
-  });
+  
   inquirer
     .prompt([
       {
         type: "input",
-        name: "first-name",
+        name: "first_name",
         message: "What is the Employee's first name?",
       },
       {
         type: "input",
-        name: "last-name",
+        name: "last_name",
         message: "What is the Employee's last name?",
       },
       {
-        type: "input",
-        name: "role",
+        type: "rawlist",
+        name: "role_id",
         message: "What is the Employee's role?",
-      },
+        choices: roleArrray
+      }, {
+        name: "manager_id",
+        type: "input",
+        message: "What is the employee's manager's name?"
+      }
     ])
     .then(function (answer) {
       connection.query(
@@ -164,10 +156,67 @@ function addEmployee() {
         function (err) {
           if (err) throw err;
           console.log("You're employee was successfully added");
-        }
-      );
+          runSearch();
+        });
+    })
+    
+  },
+
+
+  function removeEmployee() {
+    connection.query(
+      "SELECT * FROM employee",
+      function (err, res) {
+          if (err) throw err;
+          console.table(res);
+          let roleArray = [];
+          roleArray.push(res[0].title);
+          inquirer
+              .prompt([{
+                  name: "first_name",
+                  type: "input",
+                  message: "What is the employee's first name?"
+              }, {
+                  name: "last_name",
+                  type: "input",
+                  message: "What is the employee's last name?"
+              }, {
+                  name: "role_id",
+                  type: "rawlist",
+                  message: "What is the employee's role?",
+                  choices: roleArray
+              }]).then(function (answer) {
+                  console.log(answer);
+                  connection.query(
+                      "DELETE FROM employee SET role_id WHERE ?", {
+                          first_name: answer.first_name,
+                          last_name: answer.last_name,
+                          role_id: answer.role_id,
+                          manager_id: answer.manager_id,
+                      },
+                         function (err, res) {
+                          if (err) throw err;
+                          console.table(res);
+                          runSearch();
+                         });
+              });
+              });
+                        
+  });
+            };
+                 
+
+  function viewAllRoles()
+    connection.query("SELECT * FROM role", function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      runSearch();
     });
-}
+    
+  
+
+  function updateRole() {}
+
 runSearch();
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
